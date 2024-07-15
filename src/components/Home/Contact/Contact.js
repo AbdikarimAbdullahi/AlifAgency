@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
-import { Resend } from 'resend';
-import axios from 'axios';
-
-const resend = new Resend('re_J1Qys4C4_DX5Mu8jhGZwYohXKZq6jfkk1');
+import {useRef} from "react" 
+import emailjs from '@emailjs/browser';
+import {toast} from 'react-hot-toast'
 
 const Contact = () => {
     const [formData, setFormData] = useState({
@@ -13,8 +12,31 @@ const Contact = () => {
         subject: '',
     });
 
+    const form = useRef();
+
     console.log(formData)
 
+    const validate = () => {
+        if(!formData.email || !formData.phoneNumber || !formData.subject || !formData.message) {
+           alert('please fill all the fields');
+            return false;
+        }
+        return false;
+
+    }
+
+    const clearText = () => {
+        setFormData(
+            {
+             name: '',
+            email: '',
+            phoneNumber: '',
+            message: '',
+            subject: '',
+            }
+
+        )
+    }
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData((prevData) => ({
@@ -25,21 +47,18 @@ const Contact = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        try {
-         const response = await axios.post("http://localhost:6000//api/reg",formData,{
-            headers :{
-                'Content-Type': 'application/json',
-                'Access-Control-Allow-Origin': '*',
-                'Access-Control-Allow-Methods': 'POST',
-                'Access-Control-Allow-Headers': 'Content-Type',
-            }
-         })
-         console.log(response);
-        
-        } catch (error) {
-            console.error('Error sending email:', error);
-            alert('Failed to send email.');
+        if(validate()){
+            return;
         }
+        
+        emailjs.sendForm('service_larl3ff', 'template_sq4mh3n', form.current, 'gCZHmkGKToqQzeSr5')
+        .then((result) => {
+          alert(result.text);
+          clearText()
+          
+        }, (error) => {
+            console.log(error.text);
+        });
     };
 
     return (
@@ -54,7 +73,7 @@ const Contact = () => {
                                     <h2 className="title title2">Get In Touch</h2>
                                 </div>
                                 <div id="form-messages"></div>
-                                <form id="contact-form" onSubmit={handleSubmit}>
+                                <form ref={form} id="contact-form" onSubmit={handleSubmit}>
                                     <fieldset>
                                         <div className="row">
                                             <div className="col-lg-6 mb-3 col-md-6 col-sm-6">
@@ -66,7 +85,7 @@ const Contact = () => {
                                                     placeholder="Name"
                                                     value={formData.name}
                                                     onChange={handleChange}
-                                                    required
+                                                   
                                                 />
                                             </div>
                                             <div className="col-lg-6 mb-3 col-md-6 col-sm-6">
@@ -78,7 +97,7 @@ const Contact = () => {
                                                     placeholder="E-Mail"
                                                     value={formData.email}
                                                     onChange={handleChange}
-                                                    required
+                                                    
                                                 />
                                             </div>
                                             <div className="col-lg-6 mb-3 col-md-6 col-sm-6">
@@ -90,7 +109,7 @@ const Contact = () => {
                                                     placeholder="Phone Number"
                                                     value={formData.phoneNumber}
                                                     onChange={handleChange}
-                                                    required
+                                                   
                                                 />
                                             </div>
                                             <div className="col-lg-6 mb-3 col-md-6 col-sm-6">
@@ -102,7 +121,7 @@ const Contact = () => {
                                                     placeholder="Subject"
                                                     value={formData.subject}
                                                     onChange={handleChange}
-                                                    required
+                                                    
                                                 />
                                             </div>
                                             <div className="col-lg-12 mb-3">
@@ -113,7 +132,7 @@ const Contact = () => {
                                                     placeholder="Your message Here"
                                                     value={formData.message}
                                                     onChange={handleChange}
-                                                    required
+                                                  
                                                 ></textarea>
                                             </div>
                                         </div>
@@ -122,7 +141,7 @@ const Contact = () => {
                                                 <input
                                                     className="readon2 submit-btn con-btn"
                                                     type="submit"
-                                                    value="Submit Now"
+                                                    value="send"
                                                 />
                                             </div>
                                         </div>
@@ -189,7 +208,7 @@ const Contact = () => {
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    </div> 
                 </div>
             </div>
         </div>
